@@ -26,28 +26,35 @@ class GameLogic {
   });
 
   void updateGame() {
-    List<Region> mapRegions = regions;
+    // todo -- Show how stupid I am...
+    //  List<Region> mapRegions = regions;
 
     int greenValue = 65;
     int selectedRegion = 0;
-    late Random randomController;
-    randomController = Random();
+    Random randomController = Random();
+
 
     // print(mapRegions[0].isActive);
 
     for (var region in mapRegions) {
-      print(region.name);
+      //print(region.name);
       if (region.isActive) {
+        //print(region.name);
         region.countries.forEach((country) {
-          print(country.name);
-          print(country.currentEnergy);
+          //print(country.name);
+          country.currentEnergy > country.maximumEnergy - 5 ? country.currentEnergy = country.maximumEnergy : country.currentEnergy += randomController.nextInt(5);
+
+          //print(country.currentEnergy);
         });
+
+
 
         if (randomController.nextInt(50) == 0) {
           if (canSail == true) {
             mapRegions[randomController.nextInt(mapRegions.length)].isActive =
                 true;
           } else {
+
             mapRegions[region.adjacentRegions[
                     randomController.nextInt(region.adjacentRegions.length)]]
                 .isActive = true;
@@ -58,9 +65,7 @@ class GameLogic {
   }
 
   Map<dynamic, dynamic> getCountryColors() {
-    for (var region in mapRegions)
-      if (region.isActive)
-        for (var country in region.countries) print(country.currentEnergy);
+
     return {
       for (var region in mapRegions)
         if (region.isActive)
