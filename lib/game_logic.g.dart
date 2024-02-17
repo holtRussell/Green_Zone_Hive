@@ -20,19 +20,28 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       mapRegions: (fields[0] as List).cast<Region>(),
       canSail: fields[1] as bool,
       startGame: fields[2] as bool,
-    );
+    )
+      ..productionRate = fields[3] as int
+      ..adoptionRate = fields[4] as int
+      ..efficiencyRate = fields[5] as int;
   }
 
   @override
   void write(BinaryWriter writer, GameLogic obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.mapRegions)
       ..writeByte(1)
       ..write(obj.canSail)
       ..writeByte(2)
-      ..write(obj.startGame);
+      ..write(obj.startGame)
+      ..writeByte(3)
+      ..write(obj.productionRate)
+      ..writeByte(4)
+      ..write(obj.adoptionRate)
+      ..writeByte(5)
+      ..write(obj.efficiencyRate);
   }
 
   @override

@@ -20,13 +20,67 @@ class PowerUpPage extends StatelessWidget {
           },
           color: Colors.green,
           textColor: Colors.white,
-          child: Icon(
+          padding: const EdgeInsets.all(16),
+          shape: const CircleBorder(),
+          child: const Icon(
             Icons.sailing,
             size: 24,
           ),
-          padding: EdgeInsets.all(16),
-          shape: CircleBorder(),
-        ))
+        )),
+        Positioned(
+            top: 30,
+            left: 100,
+            child: MaterialButton(
+          onPressed: () {
+            GameLogic game = Hive.box(greenZoneData).get(0);
+            game.adoptionRate += 5;
+            Hive.box(greenZoneData).put(0, game);
+          },
+          color: Colors.green,
+          textColor: Colors.white,
+          padding: const EdgeInsets.all(16),
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.sailing,
+            size: 24,
+          ),
+        )),
+        Positioned(
+            right: 20,
+            top: 20,
+            child: MaterialButton(
+          onPressed: () {
+            GameLogic game = Hive.box(greenZoneData).get(0);
+            game.adoptionRate += 10;
+            Hive.box(greenZoneData).put(0, game);
+          },
+          color: Colors.green,
+          textColor: Colors.white,
+          padding: const EdgeInsets.all(16),
+          shape: const CircleBorder(),
+          child: const Icon(
+            Icons.airplanemode_on,
+            size: 24,
+          ),
+        )),
+        Positioned(
+            right: 20,
+            bottom: 20,
+            child: MaterialButton(
+              onPressed: () {
+                GameLogic game = Hive.box(greenZoneData).get(0);
+                game.adoptionRate += 100;
+                Hive.box(greenZoneData).put(0, game);
+              },
+              color: Colors.green,
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(16),
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.grid_4x4,
+                size: 24,
+              ),
+            )),
       ],
     );
   }

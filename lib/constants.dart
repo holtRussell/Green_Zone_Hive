@@ -1,1 +1,1 @@
-const String greenZoneData = 'greenZoneData';
+const String greenZoneData = 'greenZoneData1';

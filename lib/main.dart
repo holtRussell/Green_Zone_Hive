@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
@@ -25,7 +24,7 @@ void main() async {
   await Hive.openBox(greenZoneData);
   Hive.box(greenZoneData ).put(0, GameLogic(mapRegions: regions));
 
-  //print("deleted");
+  print("deleted");
 
   runApp(const MyApp());
 }
@@ -69,14 +68,12 @@ class _MyHomePageState extends State<MyHomePage> {
     print(game.mapRegions[1].isActive);
     print(game.mapRegions[2].isActive);
     print(game.mapRegions[0].countries[0].currentEnergy);
-    Timer timeOffset = Timer.periodic(Duration(milliseconds: 50), (timer) {
+    Timer timeOffset = Timer.periodic(const Duration(seconds: 1), (timer) {
       game = Hive.box(greenZoneData).get(0);
       setState(() {
         game.updateGame();
         Hive.box(greenZoneData).put(0, game);
       });
-
-
     });
 
     super.initState();
@@ -95,7 +92,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => PowerUpPage()));},),
+        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const PowerUpPage()));},),
       body: SafeArea(
         child: Center(
           child: InteractiveViewer(
@@ -104,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
               instructions: SMapWorld.instructions,
 
               // Default color for all countries.
-              defaultColor: Color.fromRGBO(45, 45, 45, 1.0),
-              countryBorder: CountryBorder(color: Colors.black, width: 1.0),
+              defaultColor: const Color.fromRGBO(45, 45, 45, 1.0),
+              countryBorder: const CountryBorder(color: Colors.black, width: 1.0),
 
               // Matching class to specify custom colors for each area.
               colors: game.getCountryColors(),

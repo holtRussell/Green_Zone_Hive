@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:green_zone/regions.dart';
 import 'package:hive/hive.dart';
 
 part 'country.g.dart';
