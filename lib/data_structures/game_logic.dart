@@ -1,7 +1,8 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
 
-import 'package:green_zone/regions.dart';
+import 'package:flutter/material.dart';
+import 'package:green_zone/data_structures/power_up.dart';
+import 'package:green_zone/data_structures/regions.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 part 'game_logic.g.dart';
@@ -41,36 +42,34 @@ class GameLogic {
   @HiveField(5)
   int efficiencyRate = 1;
 
-  void updateGame() {
+  @HiveField(6)
+  List<List<PowerUp>> powerUps = abilities;
 
+  void updateGame() {
     for (var region in mapRegions) {
       regionTasks(region: region);
     }
-
-
   }
 
-  regionTasks({required Region region}){
-    if(!region.isActive) return;
+  regionTasks({required Region region}) {
+    if (!region.isActive) return;
 
     // Updates the country energy levels in the region
     updateCountryColor(region: region, offset: productionRate + 1);
 
     // Spreads energy to another region
     spreadRegion(region: region);
-
   }
 
-  updateCountryColor({required Region region, required int offset}){
-
-
+  updateCountryColor({required Region region, required int offset}) {
     //Loops through each country to update energy Level (color)
     for (var country in region.countries) {
-
-    // Updates country
-    country.currentEnergy > country.maximumEnergy - offset ? country.currentEnergy = country.maximumEnergy : country.currentEnergy += randomController.nextInt(offset);
-}
-}
+      // Updates country
+      country.currentEnergy > country.maximumEnergy - offset
+          ? country.currentEnergy = country.maximumEnergy
+          : country.currentEnergy += randomController.nextInt(offset);
+    }
+  }
 
   spreadRegion({required Region region}) {
     // triggers spread event if random is less than DR
@@ -78,20 +77,16 @@ class GameLogic {
 
     // if canSail, selects from global list rather than adjacent countries
     if (canSail == true) {
-      mapRegions[randomController.nextInt(mapRegions.length)].isActive =
-      true;
+      mapRegions[randomController.nextInt(mapRegions.length)].isActive = true;
       return;
     }
 
-
-      mapRegions[region.adjacentRegions[
-      randomController.nextInt(region.adjacentRegions.length)]]
-          .isActive = true;
-
+    mapRegions[region.adjacentRegions[
+            randomController.nextInt(region.adjacentRegions.length)]]
+        .isActive = true;
   }
 
   Map<dynamic, dynamic> getCountryColors() {
-
     return {
       for (var region in mapRegions)
         if (region.isActive)
@@ -105,8 +100,6 @@ class GameLogic {
             ),
     };
   }
-
-
 
   selectCountry({required String id}) {
     for (int i = 0; i < mapRegions.length; i++) {

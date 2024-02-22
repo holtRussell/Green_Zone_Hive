@@ -5,10 +5,10 @@ import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:green_zone/constants.dart';
-import 'package:green_zone/country.dart';
-import 'package:green_zone/game_logic.dart';
-import 'package:green_zone/power_up_page.dart';
-import 'package:green_zone/regions.dart';
+import 'package:green_zone/data_structures/country.dart';
+import 'package:green_zone/data_structures/game_logic.dart';
+import 'package:green_zone/data_structures/regions.dart';
+import 'package:green_zone/widgets/power_up_page.dart';
 import 'package:hive_flutter/adapters.dart';
 
 void main() async {
@@ -18,13 +18,14 @@ void main() async {
   Hive.registerAdapter(GameLogicAdapter());
   Hive.registerAdapter(RegionAdapter());
   Hive.registerAdapter(CountryAdapter());
+  // Hive.registerAdapter(PowerUpAdapter());
 
   // Open first box
   // await Hive.box(greenZoneData).deleteFromDisk();
   await Hive.openBox(greenZoneData);
-  Hive.box(greenZoneData ).put(0, GameLogic(mapRegions: regions));
+  // Hive.box(greenZoneData).put(0, GameLogic(mapRegions: regions));
 
-  print("deleted");
+  // print("deleted");
 
   runApp(const MyApp());
 }
@@ -79,11 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  // todo -- So, there's two operations:
-  //  1) Rendering (This is always O(n))    - Should work from a list of Countires
-  //  2) updating, which is by region, and can exclude inactive regions
-  // If I pair regions to countries in initialization, I can
-
   @override
   Widget build(BuildContext context) {
     // force landscape orientation
@@ -92,37 +88,100 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (_) => const PowerUpPage()));},),
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => const PowerUpPage()));
+        },
+      ),
       body: SafeArea(
-        child: Center(
-          child: InteractiveViewer(
-            child: SimpleMap(
-              // String of instructions to draw the map.
-              instructions: SMapWorld.instructions,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Container(
+            //   width: double.infinity,
+            //   height: 60,
+            //   color: Colors.red,
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Text("News Placeholder"),
+            //       Text(
+            //         "Date",
+            //         style: TextStyle(
+            //           color: Colors.white,
+            //           fontSize: 22.0,
+            //           fontWeight: FontWeight.bold,
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            InteractiveViewer(
+              child: Stack(
+                children: [
+                  SimpleMap(
+                    // String of instructions to draw the map.
+                    instructions: SMapWorld.instructions,
 
-              // Default color for all countries.
-              defaultColor: const Color.fromRGBO(45, 45, 45, 1.0),
-              countryBorder: const CountryBorder(color: Colors.black, width: 1.0),
+                    // Default color for all countries.
+                    defaultColor: const Color.fromRGBO(45, 45, 45, 1.0),
+                    countryBorder:
+                        const CountryBorder(color: Colors.black, width: 1.0),
 
-              // Matching class to specify custom colors for each area.
-              colors: game.getCountryColors(),
+                    // Matching class to specify custom colors for each area.
+                    colors: game.getCountryColors(),
 
-              // Details of what area is being touched, giving you the ID, name and tapdetails
-              callback: (id, name, tapdetails) {
-
-                if (!game.startGame) {
-                  setState(() {
-                    game.selectCountry(id: id);
-                  });
-                }
-                Hive.box(greenZoneData).put(0, game);
-              },
+                    // Details of what area is being touched, giving you the ID, name and tapdetails
+                    callback: (id, name, tapdetails) {
+                      if (!game.startGame) {
+                        setState(() {
+                          game.selectCountry(id: id);
+                        });
+                      }
+                      Hive.box(greenZoneData).put(0, game);
+                    },
+                  ),
+                  Positioned(
+                    top: MediaQuery.sizeOf(context).height / 3,
+                    right: MediaQuery.sizeOf(context).width / 3,
+                    child: Container(
+                        height: 30.0,
+                        width: 30.0,
+                        color: Colors.white,
+                        child: Center(
+                          child: Icon(
+                            Icons.bolt,
+                            color: Colors.green,
+                            size: 26.0,
+                          ),
+                        )),
+                  ),
+                ],
+              ),
             ),
-          ),
+            // Container(
+            //   width: double.infinity,
+            //   height: 40,
+            //   color: Colors.green,
+            //   child: Row(
+            //     children: [
+            //       Container(
+            //         color: Colors.blue,
+            //       ),
+            //       TextButton(
+            //           onPressed: () {},
+            //           child: Text(
+            //             "Press Me :)",
+            //             style: TextStyle(
+            //               fontSize: 30.0,
+            //             ),
+            //           ))
+            //     ],
+            //   ),
+            // )
+          ],
         ),
       ),
-
     );
-
   }
 }

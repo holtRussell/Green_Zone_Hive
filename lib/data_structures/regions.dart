@@ -1,4 +1,4 @@
-import 'package:green_zone/country.dart';
+import 'package:green_zone/data_structures/country.dart';
 import 'package:hive/hive.dart';
 
 part 'regions.g.dart';
