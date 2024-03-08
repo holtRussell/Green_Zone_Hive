@@ -29,7 +29,7 @@ void main() async {
 
   // Open first box
   await Hive.openBox(greenZoneData);
-  startNewGame();
+  // startNewGame();
 
   runApp(const MyApp());
 }
