@@ -44,7 +44,6 @@ List<List<PowerUp>> abilities = [
       isLocked: false,
       cost: 3,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.canSail = true;
         Hive.box(greenZoneData).put(0, game);
@@ -56,7 +55,6 @@ List<List<PowerUp>> abilities = [
       effect: "+5 Adoption Rate",
       cost: 5,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.adoptionRate += 5;
         Hive.box(greenZoneData).put(0, game);
@@ -69,7 +67,6 @@ List<List<PowerUp>> abilities = [
       effect: "+10 Adoption Rate",
       cost: 9,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.adoptionRate += 10;
         Hive.box(greenZoneData).put(0, game);
@@ -82,7 +79,6 @@ List<List<PowerUp>> abilities = [
       effect: "+20 Adoption Rate",
       cost: 12,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.adoptionRate += 20;
         print(game.adoptionRate);
@@ -100,7 +96,6 @@ List<List<PowerUp>> abilities = [
       isSelected: false,
       isLocked: false,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.productionRate += 3;
         print(game.productionRate);
@@ -113,7 +108,6 @@ List<List<PowerUp>> abilities = [
       effect: '+5 Energy rate',
       cost: 5,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.productionRate += 5;
         Hive.box(greenZoneData).put(0, game);
@@ -126,7 +120,6 @@ List<List<PowerUp>> abilities = [
       effect: '+10 Energy rate',
       cost: 8,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.productionRate += 10;
         Hive.box(greenZoneData).put(0, game);
@@ -139,7 +132,6 @@ List<List<PowerUp>> abilities = [
       cost: 15,
       effect: '+20 Energy rate',
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.productionRate += 20;
         Hive.box(greenZoneData).put(0, game);
@@ -156,7 +148,6 @@ List<List<PowerUp>> abilities = [
       isLocked: false,
       cost: 3,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.efficiencyRate += 3;
         Hive.box(greenZoneData).put(0, game);
@@ -168,7 +159,6 @@ List<List<PowerUp>> abilities = [
       effect: "+5 Efficiency Rate",
       cost: 5,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.efficiencyRate += 5;
         Hive.box(greenZoneData).put(0, game);
@@ -181,7 +171,6 @@ List<List<PowerUp>> abilities = [
       effect: "+10 Efficiency Rate",
       cost: 9,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.efficiencyRate += 10;
         Hive.box(greenZoneData).put(0, game);
@@ -194,7 +183,6 @@ List<List<PowerUp>> abilities = [
       effect: "+20 Efficiency Rate",
       cost: 15,
       callback: () {
-        print("in function");
         GameLogic game = Hive.box(greenZoneData).get(0);
         game.efficiencyRate += 20;
         Hive.box(greenZoneData).put(0, game);

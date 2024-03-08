@@ -50,6 +50,9 @@ class GameLogic {
   @HiveField(7)
   List<CountryBubble> countryBubbles = [];
 
+  @HiveField(8)
+  int energyLevel = 0;
+
   late List<List<PowerUp>> powerUps = abilities;
 
   void updateGame() {
@@ -101,16 +104,27 @@ class GameLogic {
     // Spreads energy to another region
     spreadRegion(region: region);
 
+    checkEnergy(region: region);
+  }
+
+  checkEnergy({required Region region}) {
+    if (region.hasBubble) return;
+
+    if (randomController.nextInt(20000) > productionRate) return;
     spawnEnergy(region: region);
   }
 
   spawnEnergy({required Region region}) {
-    if (region.hasBubble) return;
-
-    // if (randomController.nextInt(20000) > productionRate) return;
-
+    var bubble = CountryBubble(
+      region: region,
+      callback: () {},
+    );
+    bubble.callback = () {
+      region.hasBubble = false;
+      countryBubbles.remove(bubble);
+    };
     region.hasBubble = true;
-    countryBubbles.add(CountryBubble(region: region));
+    countryBubbles.add(bubble);
   }
 
   updateCountryColor({required Region region, required int offset}) {
@@ -129,7 +143,8 @@ class GameLogic {
 
     // if canSail, selects from global list rather than adjacent countries
     if (canSail == true) {
-      mapRegions[randomController.nextInt(mapRegions.length)].isActive = true;
+      mapRegions[randomController.nextInt(mapRegions.length - 1)].isActive =
+          true;
       return;
     }
 
@@ -162,6 +177,7 @@ class GameLogic {
           canSail = mapRegions[i].canSail;
           print(mapRegions[i].name);
           print(canSail);
+          spawnEnergy(region: mapRegions[i]);
           return;
         }
       }

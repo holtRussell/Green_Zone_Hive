@@ -357,6 +357,7 @@ List<Region> regions = [
   Region(
     name: "Za Wardo",
     adjacentRegions: [],
+    isActive: false,
     countries: [
       Country(
         name: "",
