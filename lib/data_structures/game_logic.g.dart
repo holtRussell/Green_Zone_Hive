@@ -17,10 +17,10 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return GameLogic(
-      mapRegions: (fields[0] as List).cast<Region>(),
-      canSail: fields[1] as bool,
-      startGame: fields[2] as bool,
+      canSail: fields[0] as bool,
+      startGame: fields[1] as bool,
     )
+      ..mapRegions = (fields[2] as List).cast<Region>()
       ..productionRate = fields[3] as int
       ..adoptionRate = fields[4] as int
       ..efficiencyRate = fields[5] as int
@@ -34,11 +34,11 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
     writer
       ..writeByte(7)
       ..writeByte(0)
-      ..write(obj.mapRegions)
-      ..writeByte(1)
       ..write(obj.canSail)
-      ..writeByte(2)
+      ..writeByte(1)
       ..write(obj.startGame)
+      ..writeByte(2)
+      ..write(obj.mapRegions)
       ..writeByte(3)
       ..write(obj.productionRate)
       ..writeByte(4)

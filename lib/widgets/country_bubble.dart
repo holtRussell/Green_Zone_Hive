@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 
-class CountryBubble extends StatelessWidget {
-  int verticalOffset;
-  int horizontalOffset;
+import '../data_structures/regions.dart';
 
-  CountryBubble(
-      {required this.verticalOffset,
-      required this.horizontalOffset,
-      super.key});
+class CountryBubble extends StatelessWidget {
+  Region region;
+
+  CountryBubble({required this.region, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: MediaQuery.sizeOf(context).height * verticalOffset / 100,
-      left: MediaQuery.sizeOf(context).width * horizontalOffset / 100,
+      top: MediaQuery.sizeOf(context).height * region.verticalOffset / 100,
+      left: MediaQuery.sizeOf(context).width * region.horizontalOffset / 100,
       child: Container(
           height: 30.0,
           width: 30.0,

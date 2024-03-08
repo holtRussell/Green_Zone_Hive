@@ -12,7 +12,7 @@ import 'package:green_zone/widgets/power_up_page.dart';
 import 'package:hive_flutter/adapters.dart';
 
 void startNewGame() {
-  GameLogic game = GameLogic(mapRegions: regions);
+  GameLogic game = GameLogic();
 
   game.buildPowerUpState();
 
@@ -154,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Hive.box(greenZoneData).put(0, game);
                     },
                   ),
+                  if (game.countryBubbles.isNotEmpty) ...game.countryBubbles,
                 ],
               ),
             ),

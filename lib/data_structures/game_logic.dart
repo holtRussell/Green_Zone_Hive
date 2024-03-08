@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:green_zone/data_structures/power_up.dart';
 import 'package:green_zone/data_structures/regions.dart';
+import 'package:green_zone/widgets/country_bubble.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 part 'game_logic.g.dart';
@@ -11,18 +12,19 @@ part 'game_logic.g.dart';
 @HiveType(typeId: 0)
 class GameLogic {
   // Values that need saving
+
   @HiveField(0)
-  List<Region> mapRegions;
-  @HiveField(1)
   bool canSail;
-  @HiveField(2)
+  @HiveField(1)
   bool startGame;
 
   GameLogic({
-    required this.mapRegions,
     this.canSail = false,
     this.startGame = false,
   });
+
+  @HiveField(2)
+  List<Region> mapRegions = regions;
 
   int greenValue = 65;
   //
@@ -44,6 +46,9 @@ class GameLogic {
 
   @HiveField(6)
   List<List<int>> powerUpState = [];
+
+  @HiveField(7)
+  List<CountryBubble> countryBubbles = [];
 
   late List<List<PowerUp>> powerUps = abilities;
 
@@ -77,13 +82,13 @@ class GameLogic {
       return;
     }
 
-    // 2 means purchased
-    if (state == 2) {
-      powerUp.isActive = true;
-    }
-
     // both 1 and 2 will be unlocked
     powerUp.isLocked = false;
+
+    if (state == 1) return;
+
+    // 2 means powerup is purchased
+    powerUp.isActive = true;
     return;
   }
 
@@ -95,6 +100,17 @@ class GameLogic {
 
     // Spreads energy to another region
     spreadRegion(region: region);
+
+    spawnEnergy(region: region);
+  }
+
+  spawnEnergy({required Region region}) {
+    if (region.hasBubble) return;
+
+    // if (randomController.nextInt(20000) > productionRate) return;
+
+    region.hasBubble = true;
+    countryBubbles.add(CountryBubble(region: region));
   }
 
   updateCountryColor({required Region region, required int offset}) {
