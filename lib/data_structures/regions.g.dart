@@ -20,6 +20,8 @@ class RegionAdapter extends TypeAdapter<Region> {
       countries: (fields[2] as List).cast<Country>(),
       name: fields[0] as String,
       adjacentRegions: (fields[1] as List).cast<int>(),
+      verticalOffset: fields[6] as int,
+      horizontalOffset: fields[7] as int,
       canSail: fields[4] as bool,
       hasBubble: fields[5] as bool,
       isActive: fields[3] as bool,
@@ -29,7 +31,7 @@ class RegionAdapter extends TypeAdapter<Region> {
   @override
   void write(BinaryWriter writer, Region obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -41,7 +43,11 @@ class RegionAdapter extends TypeAdapter<Region> {
       ..writeByte(4)
       ..write(obj.canSail)
       ..writeByte(5)
-      ..write(obj.hasBubble);
+      ..write(obj.hasBubble)
+      ..writeByte(6)
+      ..write(obj.verticalOffset)
+      ..writeByte(7)
+      ..write(obj.horizontalOffset);
   }
 
   @override

@@ -11,6 +11,14 @@ import 'package:green_zone/data_structures/regions.dart';
 import 'package:green_zone/widgets/power_up_page.dart';
 import 'package:hive_flutter/adapters.dart';
 
+void startNewGame() {
+  GameLogic game = GameLogic(mapRegions: regions);
+
+  game.buildPowerUpState();
+
+  Hive.box(greenZoneData).put(0, game);
+}
+
 void main() async {
   // initialize Hive
   await Hive.initFlutter();
@@ -18,14 +26,10 @@ void main() async {
   Hive.registerAdapter(GameLogicAdapter());
   Hive.registerAdapter(RegionAdapter());
   Hive.registerAdapter(CountryAdapter());
-  // Hive.registerAdapter(PowerUpAdapter());
 
   // Open first box
-  // await Hive.box(greenZoneData).deleteFromDisk();
   await Hive.openBox(greenZoneData);
-  // Hive.box(greenZoneData).put(0, GameLogic(mapRegions: regions));
-
-  // print("deleted");
+  startNewGame();
 
   runApp(const MyApp());
 }
@@ -62,14 +66,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     game = Hive.box(greenZoneData).get(0);
-    //game.mapRegions[0].countries[0].currentEnergy = game.mapRegions[0].countries[0].maximumEnergy;
+
+    game.buildPowerUpList();
+
+    Hive.box(greenZoneData).put(0, game);
+    setState(() {});
     print(game.startGame);
     print(game.canSail);
     print(game.mapRegions[0].isActive);
     print(game.mapRegions[1].isActive);
     print(game.mapRegions[2].isActive);
     print(game.mapRegions[0].countries[0].currentEnergy);
-    Timer timeOffset = Timer.periodic(const Duration(seconds: 1), (timer) {
+    print(game.productionRate);
+    print(game.adoptionRate);
+    print(game.efficiencyRate);
+
+    Timer timeOffset =
+        Timer.periodic(const Duration(milliseconds: 30), (timer) {
       game = Hive.box(greenZoneData).get(0);
       setState(() {
         game.updateGame();
@@ -140,21 +153,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                       Hive.box(greenZoneData).put(0, game);
                     },
-                  ),
-                  Positioned(
-                    top: MediaQuery.sizeOf(context).height / 3,
-                    right: MediaQuery.sizeOf(context).width / 3,
-                    child: Container(
-                        height: 30.0,
-                        width: 30.0,
-                        color: Colors.white,
-                        child: Center(
-                          child: Icon(
-                            Icons.bolt,
-                            color: Colors.green,
-                            size: 26.0,
-                          ),
-                        )),
                   ),
                 ],
               ),

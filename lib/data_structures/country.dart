@@ -20,6 +20,6 @@ class Country {
     required this.abbreviation,
     this.currentEnergy = 0,
     this.maximumEnergy =
-        500, // Scores range from 300, 500, 1000, 1,500 for mondo countries
+        5000, // Scores range from 300, 500, 1000, 1,500 for mondo countries
   });
 }

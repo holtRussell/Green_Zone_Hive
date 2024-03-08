@@ -24,8 +24,8 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       ..productionRate = fields[3] as int
       ..adoptionRate = fields[4] as int
       ..efficiencyRate = fields[5] as int
-      ..powerUps = (fields[6] as List)
-          .map((dynamic e) => (e as List).cast<PowerUp>())
+      ..powerUpState = (fields[6] as List)
+          .map((dynamic e) => (e as List).cast<int>())
           .toList();
   }
 
@@ -46,7 +46,7 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       ..writeByte(5)
       ..write(obj.efficiencyRate)
       ..writeByte(6)
-      ..write(obj.powerUps);
+      ..write(obj.powerUpState);
   }
 
   @override

@@ -43,12 +43,48 @@ class GameLogic {
   int efficiencyRate = 1;
 
   @HiveField(6)
-  List<List<PowerUp>> powerUps = abilities;
+  List<List<int>> powerUpState = [];
+
+  late List<List<PowerUp>> powerUps = abilities;
 
   void updateGame() {
     for (var region in mapRegions) {
       regionTasks(region: region);
     }
+  }
+
+  buildPowerUpState() {
+    for (int i = 0; i < abilities.length; i++) {
+      powerUpState.add([]);
+      for (int j = 0; j < abilities[i].length; j++) {
+        powerUpState[i].add(0);
+      }
+    }
+  }
+
+  void buildPowerUpList() {
+    for (int i = 0; i < abilities.length; i++) {
+      powerUpState.add([]);
+      for (int j = 0; j < abilities[i].length; j++) {
+        getPowerUpState(powerUp: powerUps[i][j], state: powerUpState[i][j]);
+      }
+    }
+  }
+
+  void getPowerUpState({required PowerUp powerUp, required int state}) {
+    // 0 means locked
+    if (state == 0) {
+      return;
+    }
+
+    // 2 means purchased
+    if (state == 2) {
+      powerUp.isActive = true;
+    }
+
+    // both 1 and 2 will be unlocked
+    powerUp.isLocked = false;
+    return;
   }
 
   regionTasks({required Region region}) {
@@ -73,7 +109,7 @@ class GameLogic {
 
   spreadRegion({required Region region}) {
     // triggers spread event if random is less than DR
-    if (randomController.nextInt(500) > adoptionRate) return;
+    if (randomController.nextInt(20000) > adoptionRate) return;
 
     // if canSail, selects from global list rather than adjacent countries
     if (canSail == true) {

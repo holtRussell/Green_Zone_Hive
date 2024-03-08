@@ -1,7 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:green_zone/constants.dart';
 import 'package:green_zone/data_structures/game_logic.dart';
-import 'package:green_zone/data_structures/power_up.dart';
 import 'package:green_zone/widgets/power_up_button.dart';
 import 'package:hive/hive.dart';
 
@@ -16,7 +16,6 @@ class _PowerUpPageState extends State<PowerUpPage> {
   int currentIndex = 0;
   int selectedPowerUp = 0;
 
-  // todo - Switch everything over to Game Logic instad of abilities
   late GameLogic game;
 
   @override
@@ -45,12 +44,12 @@ class _PowerUpPageState extends State<PowerUpPage> {
                       ability: game.powerUps[currentIndex][index],
                       callback: () {
                         setState(() {
-                          abilities[currentIndex][selectedPowerUp].isSelected =
-                              false;
+                          game.powerUps[currentIndex][selectedPowerUp]
+                              .isSelected = false;
                           selectedPowerUp = index;
 
-                          abilities[currentIndex][selectedPowerUp].isSelected =
-                              true;
+                          game.powerUps[currentIndex][selectedPowerUp]
+                              .isSelected = true;
                         });
                       },
                     ),
@@ -69,14 +68,14 @@ class _PowerUpPageState extends State<PowerUpPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            abilities[currentIndex][selectedPowerUp].title,
+                            game.powerUps[currentIndex][selectedPowerUp].title,
                             style: const TextStyle(
                               fontSize: 22.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            abilities[currentIndex][selectedPowerUp]
+                            game.powerUps[currentIndex][selectedPowerUp]
                                 .description,
                             style: const TextStyle(
                               fontSize: 16.0,
@@ -88,7 +87,8 @@ class _PowerUpPageState extends State<PowerUpPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(abilities[currentIndex][selectedPowerUp].effect),
+                          Text(game
+                              .powerUps[currentIndex][selectedPowerUp].effect),
                           const SizedBox(
                             height: 12.0,
                           ),
@@ -96,23 +96,45 @@ class _PowerUpPageState extends State<PowerUpPage> {
                             child: Container(
                               width: double.infinity,
                               height: 60,
-                              color: Colors.blue,
+                              color: game
+                                      .powerUps[currentIndex][selectedPowerUp]
+                                      .isActive
+                                  ? Colors.green
+                                  : Colors.grey,
+                              child: Center(
+                                child: Text(
+                                  game.powerUps[currentIndex][selectedPowerUp]
+                                          .isActive
+                                      ? "Purchased"
+                                      : "Purchase",
+                                ),
+                              ),
                             ),
                             onTap: () {
-                              abilities[currentIndex][selectedPowerUp].callback;
+                              print("calling callback");
+                              setState(() {
+                                // todo -- callback not working
 
-                              // Activates the current power up
-                              game.powerUps[currentIndex][selectedPowerUp]
-                                  .isActive = true;
-                              Hive.box(greenZoneData).put(0, game);
+                                game.powerUps[currentIndex][selectedPowerUp]
+                                    .callback();
 
-                              // Unlock the next power up (if applicable)
-                              if (selectedPowerUp ==
-                                  abilities[currentIndex].length - 1) return;
-                              game.powerUps[currentIndex][selectedPowerUp + 1]
-                                  .isLocked = false;
-                              Hive.box(greenZoneData).put(0, game);
-                              setState(() {});
+                                // Activates the current power up
+                                game.powerUps[currentIndex][selectedPowerUp]
+                                    .isActive = true;
+                                game.powerUpState[currentIndex]
+                                    [selectedPowerUp] = 2;
+                                Hive.box(greenZoneData).put(0, game);
+
+                                // Unlock the next power up (if applicable)
+                                if (selectedPowerUp ==
+                                    game.powerUps[currentIndex].length - 1)
+                                  return;
+                                game.powerUps[currentIndex][selectedPowerUp + 1]
+                                    .isLocked = false;
+                                game.powerUpState[currentIndex]
+                                    [selectedPowerUp + 1] = 1;
+                                Hive.box(greenZoneData).put(0, game);
+                              });
                             },
                           ),
                         ],
@@ -126,19 +148,28 @@ class _PowerUpPageState extends State<PowerUpPage> {
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height * 1 / 8,
               child: ListView.builder(
-                  itemCount: abilities.length,
+                  itemCount: game.powerUps.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => GestureDetector(
                         child: Container(
-                          width: 120,
+                          width: MediaQuery.sizeOf(context).width / 3,
                           height: 60,
                           margin: EdgeInsets.symmetric(horizontal: 5.0),
-                          color: Colors.blue,
-                          child: Text("Power"),
+                          color: index == currentIndex
+                              ? Colors.white
+                              : CupertinoColors.inactiveGray,
+                          child: Center(
+                              child: Text(
+                            getPowerUpLabel(index),
+                            style: TextStyle(
+                                fontWeight: index == currentIndex
+                                    ? FontWeight.w600
+                                    : FontWeight.w400),
+                          )),
                         ),
                         onTap: () {
                           setState(() {
-                            abilities[currentIndex][selectedPowerUp]
+                            game.powerUps[currentIndex][selectedPowerUp]
                                 .isSelected = false;
                             currentIndex = index;
                             selectedPowerUp = 0;
@@ -150,5 +181,11 @@ class _PowerUpPageState extends State<PowerUpPage> {
         ),
       ),
     );
+  }
+
+  String getPowerUpLabel(int index) {
+    if (index == 0) return "Adoption";
+    if (index == 1) return "Production";
+    return "Efficiency";
   }
 }

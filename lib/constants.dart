@@ -1,1 +1,8 @@
-const String greenZoneData = 'greenZoneData2';
+const String greenZoneData = 'greenZoneDatav1.1';
+
+const List<int> countryVerticalOffset = [
+  15,
+];
+const List<int> countryHorizontalOffset = [
+  20,
+];
