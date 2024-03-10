@@ -106,36 +106,52 @@ class _PowerUpPageState extends State<PowerUpPage> {
                                   game.powerUps[currentIndex][selectedPowerUp]
                                           .isActive
                                       ? "Purchased"
-                                      : "Purchase",
+                                      : "Purchase for ${game.powerUps[currentIndex][selectedPowerUp].cost} energy",
                                 ),
                               ),
                             ),
-                            onTap: () {
-                              print("calling callback");
-                              setState(() {
-                                // todo -- callback not working
+                            onTap: game.powerUps[currentIndex][selectedPowerUp]
+                                    .isActive
+                                ? () {}
+                                : () {
+                                    setState(() {
+                                      if (game.energyLevel >=
+                                          game
+                                              .powerUps[currentIndex]
+                                                  [selectedPowerUp]
+                                              .cost) {
+                                        game.energyLevel -= game
+                                            .powerUps[currentIndex]
+                                                [selectedPowerUp]
+                                            .cost;
+                                        // I forgot to add the () to the callback, and it took a week to figure out ;)
+                                        game.powerUps[currentIndex]
+                                                [selectedPowerUp]
+                                            .callback();
 
-                                game.powerUps[currentIndex][selectedPowerUp]
-                                    .callback();
+                                        // Activates the current power up
+                                        game
+                                            .powerUps[currentIndex]
+                                                [selectedPowerUp]
+                                            .isActive = true;
+                                        game.powerUpState[currentIndex]
+                                            [selectedPowerUp] = 2;
+                                        Hive.box(greenZoneData).put(0, game);
 
-                                // Activates the current power up
-                                game.powerUps[currentIndex][selectedPowerUp]
-                                    .isActive = true;
-                                game.powerUpState[currentIndex]
-                                    [selectedPowerUp] = 2;
-                                Hive.box(greenZoneData).put(0, game);
-
-                                // Unlock the next power up (if applicable)
-                                if (selectedPowerUp ==
-                                    game.powerUps[currentIndex].length - 1)
-                                  return;
-                                game.powerUps[currentIndex][selectedPowerUp + 1]
-                                    .isLocked = false;
-                                game.powerUpState[currentIndex]
-                                    [selectedPowerUp + 1] = 1;
-                                Hive.box(greenZoneData).put(0, game);
-                              });
-                            },
+                                        // Unlock the next power up (if applicable)
+                                        if (selectedPowerUp ==
+                                            game.powerUps[currentIndex].length -
+                                                1) return;
+                                        game
+                                            .powerUps[currentIndex]
+                                                [selectedPowerUp + 1]
+                                            .isLocked = false;
+                                        game.powerUpState[currentIndex]
+                                            [selectedPowerUp + 1] = 1;
+                                        Hive.box(greenZoneData).put(0, game);
+                                      }
+                                    });
+                                  },
                           ),
                         ],
                       ),

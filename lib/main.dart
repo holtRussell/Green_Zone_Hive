@@ -110,25 +110,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Container(
-            //   width: double.infinity,
-            //   height: 60,
-            //   color: Colors.red,
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Text("News Placeholder"),
-            //       Text(
-            //         "Date",
-            //         style: TextStyle(
-            //           color: Colors.white,
-            //           fontSize: 22.0,
-            //           fontWeight: FontWeight.bold,
-            //         ),
-            //       )
-            //     ],
-            //   ),
-            // ),
             InteractiveViewer(
               child: Stack(
                 children: [
@@ -155,29 +136,72 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   ),
                   if (game.countryBubbles.isNotEmpty) ...game.countryBubbles,
+                  Positioned(
+                      bottom: 0.0,
+                      child: Container(
+                        child: Row(
+                          children: [
+                            Text(
+                              "${game.energyLevel}",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                            Icon(
+                              Icons.bolt,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ))
+                  // Container(
+                  //   width: MediaQuery.sizeOf(context).width,
+                  //   height: 60,
+                  //   color: Colors.red,
+                  //   child: Row(
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Text("News Placeholder"),
+                  //       Text(
+                  //         "Date",
+                  //         style: TextStyle(
+                  //           color: Colors.white,
+                  //           fontSize: 22.0,
+                  //           fontWeight: FontWeight.bold,
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  // Positioned(
+                  //   bottom: 0.0,
+                  //   left: 0.0,
+                  //   child: Container(
+                  //     width: MediaQuery.sizeOf(context).width,
+                  //     height: 40,
+                  //     color: Colors.green,
+                  //     child: Row(
+                  //       children: [
+                  //         Container(
+                  //           color: Colors.blue,
+                  //         ),
+                  //         TextButton(
+                  //             onPressed: () {},
+                  //             child: Text(
+                  //               "Press Me :)",
+                  //               style: TextStyle(
+                  //                 fontSize: 30.0,
+                  //               ),
+                  //             ))
+                  //       ],
+                  //     ),
+                  //   ),
+                  // )
                 ],
               ),
             ),
-            // Container(
-            //   width: double.infinity,
-            //   height: 40,
-            //   color: Colors.green,
-            //   child: Row(
-            //     children: [
-            //       Container(
-            //         color: Colors.blue,
-            //       ),
-            //       TextButton(
-            //           onPressed: () {},
-            //           child: Text(
-            //             "Press Me :)",
-            //             style: TextStyle(
-            //               fontSize: 30.0,
-            //             ),
-            //           ))
-            //     ],
-            //   ),
-            // )
           ],
         ),
       ),

@@ -51,7 +51,7 @@ class GameLogic {
   List<CountryBubble> countryBubbles = [];
 
   @HiveField(8)
-  int energyLevel = 0;
+  int energyLevel = 5;
 
   late List<List<PowerUp>> powerUps = abilities;
 
@@ -122,6 +122,8 @@ class GameLogic {
     bubble.callback = () {
       region.hasBubble = false;
       countryBubbles.remove(bubble);
+      energyLevel += 1;
+      print(energyLevel);
     };
     region.hasBubble = true;
     countryBubbles.add(bubble);
