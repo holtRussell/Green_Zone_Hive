@@ -19,11 +19,10 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   late GameLogic game;
   int dayCounter = 0;
+  late Timer timeOffset;
 
   @override
   void initState() {
-    late Timer timeOffset;
-
     game.buildPowerUpList();
     game.loadEnergyList();
 
