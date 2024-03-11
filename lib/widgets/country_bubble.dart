@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import '../data_structures/regions.dart';
 
-class CountryBubble extends StatelessWidget {
-  Region region;
-  VoidCallback callback;
+part 'country_bubble.g.dart';
 
-  CountryBubble({required this.region, required this.callback, super.key});
+@HiveType(typeId: 3)
+class CountryBubble extends StatelessWidget {
+  @HiveField(0)
+  Region region;
+
+  @HiveField(1)
+  int callbackIndex;
+
+  VoidCallback callback = () {};
+
+  CountryBubble({required this.region, required this.callbackIndex, super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -91,7 +91,7 @@ List<List<PowerUp>> abilities = [
       title: "Lithium Battery",
       description: "Boosts excess energy produced by countries",
       effect: '+3 Energy rate',
-      cost: 5,
+      cost: 3,
       isActive: false,
       isSelected: false,
       isLocked: false,

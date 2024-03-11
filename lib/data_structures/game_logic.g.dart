@@ -26,13 +26,22 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       ..efficiencyRate = fields[5] as int
       ..powerUpState = (fields[6] as List)
           .map((dynamic e) => (e as List).cast<int>())
-          .toList();
+          .toList()
+      ..countryBubbles = (fields[7] as List).cast<CountryBubble>()
+      ..energyLevel = fields[8] as int
+      ..emissionsLevel = fields[9] as int
+      ..emissionsMultiplier = fields[10] as int
+      ..currentDay = fields[11] as int
+      ..hasWon = fields[12] as bool
+      ..hasLost = fields[13] as bool
+      ..regionsActivated = fields[14] as int
+      ..countriesCompleted = fields[15] as int;
   }
 
   @override
   void write(BinaryWriter writer, GameLogic obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.canSail)
       ..writeByte(1)
@@ -46,7 +55,25 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
       ..writeByte(5)
       ..write(obj.efficiencyRate)
       ..writeByte(6)
-      ..write(obj.powerUpState);
+      ..write(obj.powerUpState)
+      ..writeByte(7)
+      ..write(obj.countryBubbles)
+      ..writeByte(8)
+      ..write(obj.energyLevel)
+      ..writeByte(9)
+      ..write(obj.emissionsLevel)
+      ..writeByte(10)
+      ..write(obj.emissionsMultiplier)
+      ..writeByte(11)
+      ..write(obj.currentDay)
+      ..writeByte(12)
+      ..write(obj.hasWon)
+      ..writeByte(13)
+      ..write(obj.hasLost)
+      ..writeByte(14)
+      ..write(obj.regionsActivated)
+      ..writeByte(15)
+      ..write(obj.countriesCompleted);
   }
 
   @override

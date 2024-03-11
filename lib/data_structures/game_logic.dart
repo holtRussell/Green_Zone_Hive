@@ -53,12 +53,41 @@ class GameLogic {
   @HiveField(8)
   int energyLevel = 5;
 
+  @HiveField(9)
+  int emissionsLevel = 0;
+
+  @HiveField(10)
+  int emissionsMultiplier = 1;
+
+  @HiveField(11)
+  int currentDay = 1;
+
+  @HiveField(12)
+  bool hasWon = false;
+
+  @HiveField(13)
+  bool hasLost = false;
+
+  @HiveField(14)
+  int regionsActivated = 0;
+
+  @HiveField(15)
+  int countriesCompleted = 0;
+
   late List<List<PowerUp>> powerUps = abilities;
 
   void updateGame() {
     for (var region in mapRegions) {
       regionTasks(region: region);
     }
+
+    incrementEmissions();
+    if (currentDay % 100 == 0) emissionsMultiplier += 1;
+  }
+
+  incrementEmissions() {
+    if (emissionsLevel > 10000) hasLost = true;
+    emissionsLevel += emissionsMultiplier;
   }
 
   buildPowerUpState() {
@@ -103,56 +132,81 @@ class GameLogic {
 
     // Spreads energy to another region
     spreadRegion(region: region);
-
+    print(region.hasBubble);
     checkEnergy(region: region);
+
+    if (countriesCompleted == 195) hasWon = true;
   }
 
   checkEnergy({required Region region}) {
     if (region.hasBubble) return;
 
-    if (randomController.nextInt(20000) > productionRate) return;
+    if (randomController.nextInt(2000) > productionRate) return;
+    print("Entering Funciton");
     spawnEnergy(region: region);
   }
 
   spawnEnergy({required Region region}) {
     var bubble = CountryBubble(
       region: region,
-      callback: () {},
+      callbackIndex: 1,
     );
-    bubble.callback = () {
-      region.hasBubble = false;
-      countryBubbles.remove(bubble);
-      energyLevel += 1;
-      print(energyLevel);
-    };
+    bubble.callback = setEnergyCallback(bubble: bubble);
     region.hasBubble = true;
     countryBubbles.add(bubble);
+  }
+
+  loadEnergyList() {
+    countryBubbles.forEach((element) {
+      element.callback = setEnergyCallback(bubble: element);
+    });
+  }
+
+  dynamic setEnergyCallback({required CountryBubble bubble}) {
+    if (bubble.callbackIndex == 1) {
+      return () {
+        bubble.region.hasBubble = false;
+        countryBubbles.remove(bubble);
+        energyLevel += 1;
+        print(energyLevel);
+      };
+    }
   }
 
   updateCountryColor({required Region region, required int offset}) {
     //Loops through each country to update energy Level (color)
     for (var country in region.countries) {
+      if (country.currentEnergy == country.maximumEnergy) return;
+
       // Updates country
-      country.currentEnergy > country.maximumEnergy - offset
-          ? country.currentEnergy = country.maximumEnergy
-          : country.currentEnergy += randomController.nextInt(offset);
+
+      if (country.currentEnergy <= country.maximumEnergy - offset) {
+        country.currentEnergy += randomController.nextInt(offset);
+        return;
+      }
+
+      country.currentEnergy = country.maximumEnergy;
+      countriesCompleted += 1;
     }
   }
 
   spreadRegion({required Region region}) {
     // triggers spread event if random is less than DR
-    if (randomController.nextInt(20000) > adoptionRate) return;
+    if (randomController.nextInt(2000) > adoptionRate) return;
+
+    regionsActivated += 1;
 
     // if canSail, selects from global list rather than adjacent countries
     if (canSail == true) {
-      mapRegions[randomController.nextInt(mapRegions.length - 1)].isActive =
-          true;
+      int regionIndex = randomController.nextInt(mapRegions.length - 1);
+      mapRegions[regionIndex].isActive = true;
+      spawnEnergy(region: mapRegions[regionIndex]);
+
       return;
     }
-
-    mapRegions[region.adjacentRegions[
-            randomController.nextInt(region.adjacentRegions.length)]]
-        .isActive = true;
+    int regionIndex = randomController.nextInt(region.adjacentRegions.length);
+    mapRegions[region.adjacentRegions[regionIndex]].isActive = true;
+    spawnEnergy(region: mapRegions[regionIndex]);
   }
 
   Map<dynamic, dynamic> getCountryColors() {
@@ -171,14 +225,14 @@ class GameLogic {
   }
 
   selectCountry({required String id}) {
+    print(id);
     for (int i = 0; i < mapRegions.length; i++) {
       for (var country in mapRegions[i].countries) {
         if (country.abbreviation == id) {
           startGame = true;
           mapRegions[i].isActive = true;
+          regionsActivated += 1;
           canSail = mapRegions[i].canSail;
-          print(mapRegions[i].name);
-          print(canSail);
           spawnEnergy(region: mapRegions[i]);
           return;
         }
