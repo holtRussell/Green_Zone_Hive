@@ -27,6 +27,7 @@ void main() async {
   Hive.registerAdapter(RegionAdapter());
   Hive.registerAdapter(CountryAdapter());
   Hive.registerAdapter(CountryBubbleAdapter());
+  // Hive.registerAdapter(MenuStateAdapter());
 
   // Open first box
   await Hive.openBox(greenZoneData);
