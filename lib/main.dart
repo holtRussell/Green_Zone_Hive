@@ -1,33 +1,37 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:countries_world_map/countries_world_map.dart';
-import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:green_zone/constants.dart';
-import 'package:green_zone/country.dart';
-import 'package:green_zone/game_logic.dart';
-import 'package:green_zone/regions.dart';
+import 'package:green_zone/data_structures/country.dart';
+import 'package:green_zone/data_structures/game_logic.dart';
+import 'package:green_zone/data_structures/menu_state.dart';
+import 'package:green_zone/data_structures/regions.dart';
+import 'package:green_zone/screens/game_screen.dart';
+import 'package:green_zone/widgets/country_bubble.dart';
 import 'package:hive_flutter/adapters.dart';
 
 void main() async {
   // initialize Hive
   await Hive.initFlutter();
-
   Hive.registerAdapter(GameLogicAdapter());
   Hive.registerAdapter(RegionAdapter());
   Hive.registerAdapter(CountryAdapter());
+  Hive.registerAdapter(CountryBubbleAdapter());
+  Hive.registerAdapter(MenuStateAdapter());
 
   // Open first box
   await Hive.openBox(greenZoneData);
+
+  //startNewGame();
+  Hive.box(greenZoneData).put(0, GameLogic());
+  Hive.box(greenZoneData).put(1, MenuState());
 
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,42 +41,46 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Green Zone'),
+      home: MyHomePage(title: 'Green Zone'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  String title;
+  MyHomePage({super.key, required this.title});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late MenuState menu;
   late GameLogic game;
+  late Timer timeOffset;
+  int dayCounter = 0;
+  double greenValue = 0.4;
+  double incrementValue = 0.02;
 
   @override
   void initState() {
     game = Hive.box(greenZoneData).get(0);
-    Timer timeOffset = Timer.periodic(Duration(milliseconds: 50), (timer) {
-      game = Hive.box(greenZoneData).get(0);
-      setState(() {
-        game.updateGame();
-      });
+    menu = Hive.box(greenZoneData).get(1);
+    menu.game = game;
+    game.countCountries();
 
-      Hive.box(greenZoneData).put(0, game);
+    setState(() {});
+
+    timeOffset = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      setState(() {
+        game = Hive.box(greenZoneData).get(0);
+        greenValue += incrementValue;
+        if (greenValue < 0.2 || greenValue > 0.95) incrementValue *= -1;
+      });
     });
 
     super.initState();
   }
-
-  // todo -- So, there's two operations:
-  //  1) Rendering (This is always O(n))    - Should work from a list of Countires
-  //  2) updating, which is by region, and can exclude inactive regions
-  // If I pair regions to countries in initialization, I can
 
   @override
   Widget build(BuildContext context) {
@@ -82,31 +90,63 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Center(
-          child: InteractiveViewer(
-            child: SimpleMap(
-              // String of instructions to draw the map.
-              instructions: SMapWorld.instructions,
-
-              // Default color for all countries.
-              defaultColor: Color.fromRGBO(45, 45, 45, 1.0),
-              countryBorder: CountryBorder(color: Colors.black, width: 1.0),
-
-              // Matching class to specify custom colors for each area.
-              colors: game.getCountryColors(),
-
-              // Details of what area is being touched, giving you the ID, name and tapdetails
-              callback: (id, name, tapdetails) {
-                game.startGame = false;
-                if (!game.startGame) {
-                  setState(() {
-                    game.selectCountry(id: id);
-                  });
-                }
-                Hive.box(greenZoneData).put(0, game);
-              },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  widget.title,
+                  style: TextStyle(
+                    color: Colors.green.withOpacity(greenValue),
+                    fontSize: 64.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-          ),
+            GestureDetector(
+              onTap: () {
+                game = GameLogic();
+                Hive.box(greenZoneData).put(0, game);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => GameScreen(game: game)));
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 4.0),
+                width: 330,
+                height: 65,
+                color: Colors.white,
+                child: Center(
+                  child: Text("New Game"),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (!game.startGame) return;
+                game = Hive.box(greenZoneData).get(0);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => GameScreen(game: game)));
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 4.0),
+                width: 330,
+                height: 65,
+                color: game.startGame ? Colors.white : Colors.grey,
+                child: Center(child: Text("Continue Game")),
+              ),
+            ),
+            //
+            // TODO - Achievements Section
+            // Container(
+            //   margin: EdgeInsets.symmetric(vertical: 4.0),
+            //   width: 330,
+            //   height: 65,
+            //   color: Colors.white,
+            // ),
+          ],
         ),
       ),
     );

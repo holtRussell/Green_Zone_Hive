@@ -1,38 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'game_logic.dart';
+part of 'country_bubble.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GameLogicAdapter extends TypeAdapter<GameLogic> {
+class CountryBubbleAdapter extends TypeAdapter<CountryBubble> {
   @override
-  final int typeId = 0;
+  final int typeId = 3;
 
   @override
-  GameLogic read(BinaryReader reader) {
+  CountryBubble read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return GameLogic(
-      mapRegions: (fields[0] as List).cast<Region>(),
-      canSail: fields[1] as bool,
-      startGame: fields[2] as bool,
+    return CountryBubble(
+      region: fields[0] as Region,
+      callbackIndex: fields[1] as int,
     );
   }
 
   @override
-  void write(BinaryWriter writer, GameLogic obj) {
+  void write(BinaryWriter writer, CountryBubble obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.mapRegions)
-      ..writeByte(1)
-      ..write(obj.canSail)
       ..writeByte(2)
-      ..write(obj.startGame);
+      ..writeByte(0)
+      ..write(obj.region)
+      ..writeByte(1)
+      ..write(obj.callbackIndex);
   }
 
   @override
@@ -41,7 +38,7 @@ class GameLogicAdapter extends TypeAdapter<GameLogic> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GameLogicAdapter &&
+      other is CountryBubbleAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

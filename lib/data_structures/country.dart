@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:green_zone/regions.dart';
 import 'package:hive/hive.dart';
 
 part 'country.g.dart';
@@ -22,6 +20,6 @@ class Country {
     required this.abbreviation,
     this.currentEnergy = 0,
     this.maximumEnergy =
-        500, // Scores range from 300, 500, 1000, 1,500 for mondo countries
+        5000, // Scores go from 5000, 7500, and 10000 for mondo countries
   });
 }
