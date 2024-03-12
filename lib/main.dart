@@ -70,13 +70,16 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     game = Hive.box(greenZoneData).get(0);
     menu = Hive.box(greenZoneData).get(1);
+    menu.game = game;
+    game.countCountries();
 
     setState(() {});
 
     timeOffset = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
+        game = Hive.box(greenZoneData).get(0);
         greenValue += incrementValue;
-        if (greenValue < 0.4 || greenValue > 0.8) incrementValue *= -1;
+        if (greenValue < 0.2 || greenValue > 0.95) incrementValue *= -1;
       });
     });
 
@@ -94,22 +97,25 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              widget.title,
-              style: TextStyle(
-                color: Colors.green.withOpacity(greenValue),
-                fontSize: 64.0,
-                fontWeight: FontWeight.bold,
+            Container(
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  widget.title,
+                  style: TextStyle(
+                    color: Colors.green.withOpacity(greenValue),
+                    fontSize: 64.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
             GestureDetector(
               onTap: () {
-                menu.startNewGame();
+                game = GameLogic();
                 Hive.box(greenZoneData).put(0, game);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => GameScreen(game: menu.game)));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => GameScreen(game: game)));
               },
               child: Container(
                 margin: EdgeInsets.symmetric(vertical: 4.0),
@@ -123,8 +129,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             GestureDetector(
               onTap: () {
-                menu.startNewGame();
-                Hive.box(greenZoneData).put(0, game);
+                if (!game.startGame) return;
+                game = Hive.box(greenZoneData).get(0);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (_) => GameScreen(game: game)));
               },
@@ -132,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: EdgeInsets.symmetric(vertical: 4.0),
                 width: 330,
                 height: 65,
-                color: Colors.white,
+                color: game.startGame ? Colors.white : Colors.grey,
                 child: Center(child: Text("Continue Game")),
               ),
             ),

@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-import '../constants.dart';
 import 'game_logic.dart';
 
 part 'menu_state.g.dart';
@@ -14,14 +13,4 @@ class MenuState {
   GameLogic game = GameLogic();
 
   MenuState();
-
-  startNewGame() {
-    game = GameLogic();
-    Hive.box(greenZoneData).put(0, game);
-    // in function
-    print("IN new function");
-    game.buildPowerUpState();
-  }
-
-  loadGame() {}
 }

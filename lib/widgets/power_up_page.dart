@@ -6,7 +6,8 @@ import 'package:green_zone/widgets/power_up_button.dart';
 import 'package:hive/hive.dart';
 
 class PowerUpPage extends StatefulWidget {
-  const PowerUpPage({super.key});
+  GameLogic game;
+  PowerUpPage({required this.game, super.key});
 
   @override
   State<PowerUpPage> createState() => _PowerUpPageState();
@@ -16,11 +17,9 @@ class _PowerUpPageState extends State<PowerUpPage> {
   int currentIndex = 0;
   int selectedPowerUp = 0;
 
-  late GameLogic game;
-
   @override
   void initState() {
-    game = Hive.box(greenZoneData).get(0);
+    widget.game = Hive.box(greenZoneData).get(0);
     super.initState();
   }
 
@@ -39,16 +38,16 @@ class _PowerUpPageState extends State<PowerUpPage> {
                   height: MediaQuery.sizeOf(context).height * 6 / 8,
                   padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
                   child: ListView.builder(
-                    itemCount: game.powerUps[currentIndex].length,
+                    itemCount: widget.game.powerUps[currentIndex].length,
                     itemBuilder: (context, index) => PowerUpButton(
-                      ability: game.powerUps[currentIndex][index],
+                      ability: widget.game.powerUps[currentIndex][index],
                       callback: () {
                         setState(() {
-                          game.powerUps[currentIndex][selectedPowerUp]
+                          widget.game.powerUps[currentIndex][selectedPowerUp]
                               .isSelected = false;
                           selectedPowerUp = index;
 
-                          game.powerUps[currentIndex][selectedPowerUp]
+                          widget.game.powerUps[currentIndex][selectedPowerUp]
                               .isSelected = true;
                         });
                       },
@@ -68,14 +67,15 @@ class _PowerUpPageState extends State<PowerUpPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            game.powerUps[currentIndex][selectedPowerUp].title,
+                            widget.game.powerUps[currentIndex][selectedPowerUp]
+                                .title,
                             style: const TextStyle(
                               fontSize: 22.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            game.powerUps[currentIndex][selectedPowerUp]
+                            widget.game.powerUps[currentIndex][selectedPowerUp]
                                 .description,
                             style: const TextStyle(
                               fontSize: 16.0,
@@ -87,7 +87,7 @@ class _PowerUpPageState extends State<PowerUpPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(game
+                          Text(widget.game
                               .powerUps[currentIndex][selectedPowerUp].effect),
                           const SizedBox(
                             height: 12.0,
@@ -96,59 +96,74 @@ class _PowerUpPageState extends State<PowerUpPage> {
                             child: Container(
                               width: double.infinity,
                               height: 60,
-                              color: game
+                              color: widget
+                                      .game
                                       .powerUps[currentIndex][selectedPowerUp]
                                       .isActive
                                   ? Colors.green
                                   : Colors.grey,
                               child: Center(
                                 child: Text(
-                                  game.powerUps[currentIndex][selectedPowerUp]
+                                  widget
+                                          .game
+                                          .powerUps[currentIndex]
+                                              [selectedPowerUp]
                                           .isActive
                                       ? "Purchased"
-                                      : "Purchase for ${game.powerUps[currentIndex][selectedPowerUp].cost} energy",
+                                      : "Purchase for ${widget.game.powerUps[currentIndex][selectedPowerUp].cost} energy",
                                 ),
                               ),
                             ),
-                            onTap: game.powerUps[currentIndex][selectedPowerUp]
+                            onTap: widget
+                                    .game
+                                    .powerUps[currentIndex][selectedPowerUp]
                                     .isActive
                                 ? () {}
                                 : () {
                                     setState(() {
-                                      if (game.energyLevel >=
-                                          game
+                                      if (widget.game.energyLevel >=
+                                          widget
+                                              .game
                                               .powerUps[currentIndex]
                                                   [selectedPowerUp]
                                               .cost) {
-                                        game.energyLevel -= game
+                                        widget.game.energyLevel -= widget
+                                            .game
                                             .powerUps[currentIndex]
                                                 [selectedPowerUp]
                                             .cost;
                                         // I forgot to add the () to the callback, and it took a week to figure out ;)
-                                        game.powerUps[currentIndex]
+                                        widget
+                                            .game
+                                            .powerUps[currentIndex]
                                                 [selectedPowerUp]
                                             .callback();
 
                                         // Activates the current power up
-                                        game
+                                        widget
+                                            .game
                                             .powerUps[currentIndex]
                                                 [selectedPowerUp]
                                             .isActive = true;
-                                        game.powerUpState[currentIndex]
+                                        widget.game.powerUpState[currentIndex]
                                             [selectedPowerUp] = 2;
-                                        Hive.box(greenZoneData).put(0, game);
+                                        Hive.box(greenZoneData)
+                                            .put(0, widget.game);
 
                                         // Unlock the next power up (if applicable)
                                         if (selectedPowerUp ==
-                                            game.powerUps[currentIndex].length -
+                                            widget.game.powerUps[currentIndex]
+                                                    .length -
                                                 1) return;
-                                        game
+                                        widget
+                                            .game
                                             .powerUps[currentIndex]
                                                 [selectedPowerUp + 1]
                                             .isLocked = false;
-                                        game.powerUpState[currentIndex]
+                                        widget.game.powerUpState[currentIndex]
                                             [selectedPowerUp + 1] = 1;
-                                        Hive.box(greenZoneData).put(0, game);
+                                        Hive.box(greenZoneData)
+                                            .put(0, widget.game);
                                       }
                                     });
                                   },
@@ -164,7 +179,7 @@ class _PowerUpPageState extends State<PowerUpPage> {
               width: MediaQuery.sizeOf(context).width,
               height: MediaQuery.sizeOf(context).height * 1 / 8,
               child: ListView.builder(
-                  itemCount: game.powerUps.length,
+                  itemCount: widget.game.powerUps.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => GestureDetector(
                         child: Container(
@@ -185,7 +200,7 @@ class _PowerUpPageState extends State<PowerUpPage> {
                         ),
                         onTap: () {
                           setState(() {
-                            game.powerUps[currentIndex][selectedPowerUp]
+                            widget.game.powerUps[currentIndex][selectedPowerUp]
                                 .isSelected = false;
                             currentIndex = index;
                             selectedPowerUp = 0;

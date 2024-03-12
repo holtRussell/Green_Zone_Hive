@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:green_zone/data_structures/country.dart';
 import 'package:green_zone/data_structures/power_up.dart';
 import 'package:green_zone/data_structures/regions.dart';
 import 'package:green_zone/widgets/country_bubble.dart';
@@ -34,11 +35,11 @@ class GameLogic {
 
   // Increases amount of energy produced
   @HiveField(3)
-  int productionRate = 1;
+  int productionRate = 3;
 
   // % Chance of spreading to other countries
   @HiveField(4)
-  int adoptionRate = 1;
+  int adoptionRate = 3;
 
   // the more efficient your production, the easier you can counter Carbon Emissions
   @HiveField(5)
@@ -81,14 +82,26 @@ class GameLogic {
     for (var region in mapRegions) {
       regionTasks(region: region);
     }
+    print(countriesCompleted);
 
     incrementEmissions();
     if (currentDay % 100 == 0) emissionsMultiplier += 1;
   }
 
   incrementEmissions() {
+    if (efficiencyRate > emissionsMultiplier) return;
     if (emissionsLevel > 10000) hasLost = true;
     emissionsLevel += emissionsMultiplier;
+  }
+
+  countCountries() {
+    int count = 0;
+    mapRegions.forEach((region) {
+      region.countries.forEach((element) {
+        count++;
+      });
+    });
+    print(count);
   }
 
   buildPowerUpState() {
@@ -129,25 +142,27 @@ class GameLogic {
     if (!region.isActive) return;
 
     // Updates the country energy levels in the region
-    updateCountryColor(region: region, offset: productionRate + 1);
+    updateRegionColor(region: region, offset: productionRate + 1);
 
     // Spreads energy to another region
     spreadRegion(region: region);
-    // print(region.hasBubble);
+
     checkEnergy(region: region);
 
-    if (countriesCompleted == 195) hasWon = true;
+    if (countriesCompleted >= 200) hasWon = true;
   }
 
   checkEnergy({required Region region}) {
     if (region.hasBubble) return;
 
-    if (randomController.nextInt(2000) > productionRate) return;
-    //print("Entering Funciton");
+    if (randomController.nextInt(2000) > productionRate + 3 / regionsActivated)
+      return;
+
     spawnEnergy(region: region);
   }
 
   spawnEnergy({required Region region}) {
+    if (region.hasBubble) return;
     var bubble = CountryBubble(
       region: region,
       callbackIndex: 1,
@@ -169,25 +184,25 @@ class GameLogic {
         bubble.region.hasBubble = false;
         countryBubbles.remove(bubble);
         energyLevel += 1;
-        print(energyLevel);
       };
     }
   }
 
-  updateCountryColor({required Region region, required int offset}) {
+  updateRegionColor({required Region region, required int offset}) {
     //Loops through each country to update energy Level (color)
     for (var country in region.countries) {
-      print(
-          "country: ${country.abbreviation} country energy: ${country.currentEnergy} max: ${country.maximumEnergy}");
-      if (country.currentEnergy == country.maximumEnergy) return;
+      updateCountryColor(country: country, offset: offset);
+    }
+  }
 
-      // Updates country
+  updateCountryColor({required Country country, required int offset}) {
+    if (country.currentEnergy == country.maximumEnergy) return;
 
-      if (country.currentEnergy <= country.maximumEnergy - offset) {
-        country.currentEnergy += randomController.nextInt(offset);
-        return;
-      }
+    // Updates country
 
+    if (country.currentEnergy < country.maximumEnergy - offset) {
+      country.currentEnergy += randomController.nextInt(offset);
+    } else {
       country.currentEnergy = country.maximumEnergy;
       countriesCompleted += 1;
     }
@@ -204,12 +219,11 @@ class GameLogic {
       int regionIndex = randomController.nextInt(mapRegions.length - 1);
       mapRegions[regionIndex].isActive = true;
       spawnEnergy(region: mapRegions[regionIndex]);
-
-      return;
+    } else {
+      int regionIndex = randomController.nextInt(region.adjacentRegions.length);
+      mapRegions[region.adjacentRegions[regionIndex]].isActive = true;
+      spawnEnergy(region: mapRegions[region.adjacentRegions[regionIndex]]);
     }
-    int regionIndex = randomController.nextInt(region.adjacentRegions.length);
-    mapRegions[region.adjacentRegions[regionIndex]].isActive = true;
-    spawnEnergy(region: mapRegions[regionIndex]);
   }
 
   Map<dynamic, dynamic> getCountryColors() {
@@ -228,7 +242,6 @@ class GameLogic {
   }
 
   selectCountry({required String id}) {
-    print(id);
     for (int i = 0; i < mapRegions.length; i++) {
       for (var country in mapRegions[i].countries) {
         if (country.abbreviation == id) {
