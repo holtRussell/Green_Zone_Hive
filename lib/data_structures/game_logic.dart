@@ -217,12 +217,16 @@ class GameLogic {
     // if canSail, selects from global list rather than adjacent countries
     if (canSail == true) {
       int regionIndex = randomController.nextInt(mapRegions.length - 1);
-      mapRegions[regionIndex].isActive = true;
-      spawnEnergy(region: mapRegions[regionIndex]);
+      if (!mapRegions[regionIndex].isActive) {
+        mapRegions[regionIndex].isActive = true;
+        spawnEnergy(region: mapRegions[regionIndex]);
+      }
     } else {
       int regionIndex = randomController.nextInt(region.adjacentRegions.length);
-      mapRegions[region.adjacentRegions[regionIndex]].isActive = true;
-      spawnEnergy(region: mapRegions[region.adjacentRegions[regionIndex]]);
+      if (!mapRegions[region.adjacentRegions[regionIndex]].isActive) {
+        mapRegions[region.adjacentRegions[regionIndex]].isActive = true;
+        spawnEnergy(region: mapRegions[region.adjacentRegions[regionIndex]]);
+      }
     }
   }
 

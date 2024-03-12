@@ -31,7 +31,7 @@ class _GameScreenState extends State<GameScreen> {
     //
     setState(() {});
 
-    timeOffset = Timer.periodic(const Duration(milliseconds: 20), (timer) {
+    timeOffset = Timer.periodic(const Duration(milliseconds: 200), (timer) {
       widget.game = Hive.box(greenZoneData).get(0);
       if (widget.game.hasWon || widget.game.hasLost) timeOffset.cancel();
       setState(() {

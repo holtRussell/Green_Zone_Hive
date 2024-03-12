@@ -24,12 +24,8 @@ void main() async {
   await Hive.openBox(greenZoneData);
 
   //startNewGame();
-  if (await Hive.boxExists(greenZoneData)) {
-    print("Creating new box");
-
-    Hive.box(greenZoneData).put(0, GameLogic());
-    Hive.box(greenZoneData).put(1, MenuState());
-  }
+  Hive.box(greenZoneData).put(0, GameLogic());
+  Hive.box(greenZoneData).put(1, MenuState());
 
   runApp(const MyApp());
 }
