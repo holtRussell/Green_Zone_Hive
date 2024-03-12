@@ -17,12 +17,13 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  late GameLogic game;
   int dayCounter = 0;
   late Timer timeOffset;
+  late GameLogic game;
 
   @override
   void initState() {
+    game = Hive.box(greenZoneData).get(0);
     game.buildPowerUpList();
     game.loadEnergyList();
 
@@ -63,20 +64,19 @@ class _GameScreenState extends State<GameScreen> {
                         const CountryBorder(color: Colors.black, width: 1.0),
 
                     // Matching class to specify custom colors for each area.
-                    colors: widget.game.getCountryColors(),
+                    colors: game.getCountryColors(),
 
                     // Details of what area is being touched, giving you the ID, name and tapdetails
                     callback: (id, name, tapdetails) {
-                      if (!widget.game.startGame) {
+                      if (!game.startGame) {
                         setState(() {
-                          widget.game.selectCountry(id: id);
+                          game.selectCountry(id: id);
                         });
                       }
-                      Hive.box(greenZoneData).put(0, widget.game);
+                      Hive.box(greenZoneData).put(0, game);
                     },
                   ),
-                  if (widget.game.countryBubbles.isNotEmpty)
-                    ...widget.game.countryBubbles,
+                  if (game.countryBubbles.isNotEmpty) ...game.countryBubbles,
                   Positioned(
                     bottom: 0.0,
                     left: MediaQuery.sizeOf(context).width / 2 - 105,
@@ -98,10 +98,10 @@ class _GameScreenState extends State<GameScreen> {
                               Text(
                                 "Day:",
                                 style: TextStyle(
-                                    fontSize: 12.0,
+                                    fontSize: 10.0,
                                     fontWeight: FontWeight.w200),
                               ),
-                              Text("${widget.game.currentDay}"),
+                              Text("${game.currentDay}"),
                             ],
                           ),
                         ),
@@ -115,7 +115,7 @@ class _GameScreenState extends State<GameScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("${widget.game.emissionsMultiplier}x"),
+                              Text("${game.emissionsMultiplier}x"),
                               Container(
                                 height: 30.0,
                                 width: 90.0,
@@ -124,8 +124,8 @@ class _GameScreenState extends State<GameScreen> {
                                     Colors.blue,
                                     Colors.blueGrey
                                   ], stops: [
-                                    widget.game.emissionsLevel / 10000,
-                                    1.0
+                                    0.0,
+                                    game.emissionsLevel / 10000,
                                   ]),
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(
@@ -145,14 +145,14 @@ class _GameScreenState extends State<GameScreen> {
                                     builder: (_) => const PowerUpPage()));
                           },
                           child: Container(
-                            height: 30.0,
+                            height: 40.0,
                             width: 60.0,
                             color: Colors.white,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Text(
-                                  "${widget.game.energyLevel}",
+                                  "${game.energyLevel}",
                                   style: TextStyle(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w600,
@@ -170,7 +170,7 @@ class _GameScreenState extends State<GameScreen> {
                       ],
                     ),
                   ),
-                  if (widget.game.hasLost || widget.game.hasWon)
+                  if (game.hasLost || game.hasWon)
                     Container(
                       color: Colors.white,
                       width: MediaQuery.sizeOf(context).width,
@@ -184,12 +184,12 @@ class _GameScreenState extends State<GameScreen> {
                       child: Column(
                         children: [
                           Text(
-                            widget.game.hasWon ? "YOU WON!!!" : "YOU LOST :(",
+                            game.hasWon ? "YOU WON!!!" : "YOU LOST :(",
                             style: TextStyle(
                                 fontSize: 32.0, fontWeight: FontWeight.w600),
                           ),
                           Text(
-                            widget.game.hasWon
+                            game.hasWon
                                 ? "The world has embraced alternative energy. There's a bright, carbon negative future ahead :)"
                                 : "Our reliance on fossil fuels caused the earth to become inhabitable. Maybe we'll do better on the next planet we occupy...",
                           ),

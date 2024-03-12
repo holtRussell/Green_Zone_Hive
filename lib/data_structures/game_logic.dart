@@ -77,6 +77,7 @@ class GameLogic {
   late List<List<PowerUp>> powerUps = abilities;
 
   void updateGame() {
+    if (!startGame) return;
     for (var region in mapRegions) {
       regionTasks(region: region);
     }
@@ -132,7 +133,7 @@ class GameLogic {
 
     // Spreads energy to another region
     spreadRegion(region: region);
-    print(region.hasBubble);
+    // print(region.hasBubble);
     checkEnergy(region: region);
 
     if (countriesCompleted == 195) hasWon = true;
@@ -142,7 +143,7 @@ class GameLogic {
     if (region.hasBubble) return;
 
     if (randomController.nextInt(2000) > productionRate) return;
-    print("Entering Funciton");
+    //print("Entering Funciton");
     spawnEnergy(region: region);
   }
 
@@ -176,6 +177,8 @@ class GameLogic {
   updateCountryColor({required Region region, required int offset}) {
     //Loops through each country to update energy Level (color)
     for (var country in region.countries) {
+      print(
+          "country: ${country.abbreviation} country energy: ${country.currentEnergy} max: ${country.maximumEnergy}");
       if (country.currentEnergy == country.maximumEnergy) return;
 
       // Updates country

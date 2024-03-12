@@ -7,16 +7,9 @@ import 'package:green_zone/data_structures/country.dart';
 import 'package:green_zone/data_structures/game_logic.dart';
 import 'package:green_zone/data_structures/menu_state.dart';
 import 'package:green_zone/data_structures/regions.dart';
+import 'package:green_zone/screens/game_screen.dart';
 import 'package:green_zone/widgets/country_bubble.dart';
 import 'package:hive_flutter/adapters.dart';
-
-void startNewGame() {
-  GameLogic game = GameLogic();
-
-  game.buildPowerUpState();
-
-  Hive.box(greenZoneData).put(0, game);
-}
 
 void main() async {
   // initialize Hive
@@ -31,8 +24,12 @@ void main() async {
   await Hive.openBox(greenZoneData);
 
   //startNewGame();
-  if (await Hive.boxExists(greenZoneData))
-    Hive.box(greenZoneData).put(0, MenuState());
+  if (await Hive.boxExists(greenZoneData)) {
+    print("Creating new box");
+
+    Hive.box(greenZoneData).put(0, GameLogic());
+    Hive.box(greenZoneData).put(1, MenuState());
+  }
 
   runApp(const MyApp());
 }
@@ -63,22 +60,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late MenuState menu;
+  late GameLogic game;
+  late Timer timeOffset;
   int dayCounter = 0;
-  double greenValue = 0.3;
-  double incrementValue = 0.1;
+  double greenValue = 0.4;
+  double incrementValue = 0.02;
 
   @override
   void initState() {
-    late Timer timeOffset;
-    menu = Hive.box(greenZoneData).get(0);
+    game = Hive.box(greenZoneData).get(0);
+    menu = Hive.box(greenZoneData).get(1);
 
     setState(() {});
 
-    timeOffset = Timer.periodic(const Duration(seconds: 1), (timer) {
+    timeOffset = Timer.periodic(const Duration(milliseconds: 100), (timer) {
       setState(() {
         greenValue += incrementValue;
-        if (greenValue == 0.3 || greenValue == 0.9) incrementValue *= -1;
-        print("$incrementValue, $greenValue");
+        if (greenValue < 0.4 || greenValue > 0.8) incrementValue *= -1;
       });
     });
 
@@ -91,17 +89,63 @@ class _MyHomePageState extends State<MyHomePage> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     return Scaffold(
-      body: Column(
-        children: [
-          Text(
-            widget.title,
-            style: TextStyle(
-              color: Colors.green,
-              fontSize: 32.0,
-              fontWeight: FontWeight.bold,
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              widget.title,
+              style: TextStyle(
+                color: Colors.green.withOpacity(greenValue),
+                fontSize: 64.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          )
-        ],
+            GestureDetector(
+              onTap: () {
+                menu.startNewGame();
+                Hive.box(greenZoneData).put(0, game);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => GameScreen(game: menu.game)));
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 4.0),
+                width: 330,
+                height: 65,
+                color: Colors.white,
+                child: Center(
+                  child: Text("New Game"),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                menu.startNewGame();
+                Hive.box(greenZoneData).put(0, game);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => GameScreen(game: game)));
+              },
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 4.0),
+                width: 330,
+                height: 65,
+                color: Colors.white,
+                child: Center(child: Text("Continue Game")),
+              ),
+            ),
+            //
+            // TODO - Achievements Section
+            // Container(
+            //   margin: EdgeInsets.symmetric(vertical: 4.0),
+            //   width: 330,
+            //   height: 65,
+            //   color: Colors.white,
+            // ),
+          ],
+        ),
       ),
     );
   }
